@@ -1,0 +1,19 @@
+###############################################################
+# Author(s):
+#     Juhapekka Piiroinen <juhapekka.piiroinen@csc.fi>
+#
+# License: MIT
+#
+# (C) 2019 Copyright CSC – IT CENTER FOR SCIENCE LTD.
+# All Rights Reserved.
+###############################################################
+---
+- name: "Create keypair locally first"
+  openssh_keypair:
+    path: "{{ instance_keypair_path }}"
+
+- name: "Deploy public key to cPouta for authentication use"
+  os_keypair:
+    state: present
+    public_key_file: "{{ instance_keypair_path }}.pub"
+    name: "{{ instance_keypair_name }}"

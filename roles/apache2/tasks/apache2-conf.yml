@@ -1,0 +1,62 @@
+###############################################################
+# Author(s):
+#     Juhapekka Piiroinen <juhapekka.piiroinen@csc.fi>
+#
+# License: MIT
+#
+# (C) 2019 Copyright CSC – IT CENTER FOR SCIENCE LTD.
+# All Rights Reserved.
+###############################################################
+---
+- name: "SELinux: httpd_can_network_connect = 1"
+  shell:  /usr/sbin/setsebool -P httpd_can_network_connect 1
+  become: yes
+
+- name: "Enable reverse proxy for Apache2"
+  block:
+    - name: "Setup htpasswd with credential"
+      block:
+        - shell: mkdir -p {{ apache2.proxy.htpasswd_path }}
+        - shell: htpasswd -b -c {{ apache2.proxy.htpasswd }} {{ apache2.proxy.allow.user }} {{ apache2.proxy.allow.password }}
+      become: yes
+      when: apache2.proxy.htpasswd_path is defined
+  when: apache2.proxy is defined
+
+- name: "Enable SSL config for Apache2"
+  block:
+    - block:
+      - file:
+          path: /etc/httpd/conf.d/http.conf
+          state: absent
+        become: yes
+      - template:
+          src: apache2/conf.d/ssl.conf
+          dest: /etc/httpd/conf.d/ssl.conf
+        become: yes
+      - template:
+          src: apache2/conf.d/http-redirect.conf
+          dest: /etc/httpd/conf.d/http-redirect.conf
+        become: yes
+      - name: "Install mod_ssl for Apache 2"
+        shell: yum install -y mod_ssl mod_rewrite
+        become: yes
+      when: lets_encrypt is succeeded
+    - block:
+      - file:
+          path: /etc/httpd/conf.d/ssl.conf
+          state: absent
+        become: yes
+      - file:
+          path: /etc/httpd/conf.d/http-redirect.conf
+          state: absent
+        become: yes
+      - template:
+          src: apache2/conf.d/http.conf
+          dest: /etc/httpd/conf.d/http.conf
+        become: yes
+      when: lets_encrypt is failed
+
+- name: "Reload Apache2"
+  become: yes
+  shell: |
+    systemctl reload httpd

@@ -1,0 +1,20 @@
+###############################################################
+# Author(s):
+#     Juhapekka Piiroinen <juhapekka.piiroinen@csc.fi>
+#
+# License: MIT
+#
+# (C) 2019 Copyright CSC – IT CENTER FOR SCIENCE LTD.
+# All Rights Reserved.
+###############################################################
+---
+- name: "Setup matomo"
+  block:
+    - shell: mkdir -p ~/matomo
+    - template:
+        src: docker-compose.yml
+        dest: ~/matomo/docker-compose.yml
+    - template:
+        src: db.env
+        dest: ~/matomo/db.env
+    - shell: cd matomo && docker-compose up -d

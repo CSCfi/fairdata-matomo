@@ -1,0 +1,17 @@
+###############################################################
+# Author(s):
+#     Juhapekka Piiroinen <juhapekka.piiroinen@csc.fi>
+#
+# License: MIT
+#
+# (C) 2019 Copyright CSC – IT CENTER FOR SCIENCE LTD.
+# All Rights Reserved.
+###############################################################
+---
+matomo:
+    database:
+        adapter: mysql
+        tables_prefix: matomo_
+        username: matomo
+        password: CHANGE_ME
+        dbname: matomo

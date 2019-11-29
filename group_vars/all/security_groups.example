@@ -1,0 +1,20 @@
+###############################################################
+# Author(s):
+#     Juhapekka Piiroinen <juhapekka.piiroinen@csc.fi>
+#
+# License: MIT
+#
+# (C) 2019 Copyright CSC – IT CENTER FOR SCIENCE LTD.
+# All Rights Reserved.
+###############################################################
+---
+security_groups:
+    allow-outbound:
+        description: "Managed by Ansible: Allow outgoing traffic"
+        rules:
+            - { ethertype: IPv6, direction: egress, ip: "::/0" }
+            - { ethertype: IPv4, direction: egress, ip: 0.0.0.0/0 }
+    allow-all-port-80:
+        description: "Managed by Ansible: Allow all incoming to port 80, required for letsencrypt"
+        rules:
+            - { ethertype: IPv4, port: 80, protocol: tcp }

@@ -1,0 +1,47 @@
+###############################################################
+# Author(s):
+#     Juhapekka Piiroinen <juhapekka.piiroinen@csc.fi>
+#
+# License: MIT
+#
+# (C) 2019 Copyright CSC – IT CENTER FOR SCIENCE LTD.
+# All Rights Reserved.
+###############################################################
+---
+- name: Docker | Install dependencies
+  shell: yum install -y yum-utils device-mapper-persistent-data lvm2
+  become: yes
+
+- name: Docker | Add repository
+  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  become: yes
+
+- name: Docker | Install docker-ce
+  shell: yum install -y docker-ce
+  become: yes
+
+- name: Docker | Add user to group
+  shell: usermod -aG docker {{ instance_user }}
+  become: yes
+
+- name: Docker | Lets reset the ssh connection to allow the new group
+  meta: reset_connection
+
+- name: Docker | Enable on system boot
+  shell: systemctl enable docker.service
+  become: yes
+
+- name: Docker | Start
+  shell: systemctl start docker.service
+  become: yes
+
+- name: Docker | Install python module for docker
+  shell: pip install docker
+  become: yes
+
+- name: Docker | Get info on docker host
+  shell: docker system info
+  register: docker_info
+
+- debug:
+    var: docker_info

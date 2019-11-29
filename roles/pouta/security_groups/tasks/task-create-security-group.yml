@@ -1,0 +1,45 @@
+###############################################################
+# This file is part of automated cPouta Security Group
+# configuration for a project.
+#
+# Usage: make
+#
+# Author(s):
+#     Juhapekka Piiroinen <juhapekka.piiroinen@csc.fi>
+#
+# License: MIT
+#
+# (C) 2019 Copyright CSC – IT CENTER FOR SCIENCE LTD.
+# All Rights Reserved.
+###############################################################
+---
+- set_fact:
+    security_group_name: "{{ security_group.key }}"
+    security_group_description: "{{ security_group.value.description | default(omit) }}"
+    security_group_rules: "{{ security_group.value.rules | default(omit) }}"
+
+- name: "Create the security group {{ security_group_name }}"
+  block:
+    - os_security_group:
+        name: "{{ security_group_name }}"
+        description: "{{ security_group_description | default(omit) }}"
+      register: security_group_create
+    - os_security_group_rule:
+        security_group: "{{ security_group_name }}"
+        direction: egress
+        state: absent
+      when: security_group_create.changed
+    - os_security_group_rule:
+        security_group: "{{ security_group_name }}"
+        ethertype: IPv6
+        direction: egress
+        state: absent
+      when: security_group_create.changed
+
+- name: "Setup rules for the group: {{ security_group_name }}"
+  block:
+    - include_tasks: task-create-security-group-rule.yml
+      with_items: "{{ security_group_rules }}"
+      loop_control:
+        loop_var: security_group_rule
+  when: security_group_rules is defined

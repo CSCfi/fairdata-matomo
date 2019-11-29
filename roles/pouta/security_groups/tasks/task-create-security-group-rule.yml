@@ -1,0 +1,30 @@
+###############################################################
+# This file is part of automated cPouta Security Group
+# configuration for a project.
+#
+# Usage: make
+#
+# Author(s):
+#     Juhapekka Piiroinen <juhapekka.piiroinen@csc.fi>
+#
+# License: MIT
+#
+# (C) 2019 Copyright CSC – IT CENTER FOR SCIENCE LTD.
+# All Rights Reserved.
+###############################################################
+---
+- debug:
+    msg:
+      - "Ensuring that Security group '{{ security_group_name }}' has following rule:"
+      - "{{ security_group_rule }}"
+
+- name: "Create a rule for {{ security_group_name }}"
+  os_security_group_rule:
+    security_group: "{{ security_group_name }}"
+    ethertype: "{{ security_group_rule.ethertype | default(omit) }}"
+    direction: "{{ security_group_rule.direction | default(omit) }}"
+    protocol: "{{ security_group_rule.protocol | default(omit) }}"
+    port_range_min: "{{ security_group_rule.port | default(omit) }}"
+    port_range_max: "{{ security_group_rule.port | default(omit) }}"
+    remote_ip_prefix: "{{ security_group_rule.ip | default(omit) }}"
+  ignore_errors: yes

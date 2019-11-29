@@ -1,0 +1,30 @@
+###############################################################
+# Author(s):
+#     Juhapekka Piiroinen <juhapekka.piiroinen@csc.fi>
+#
+# License: MIT
+#
+# (C) 2019 Copyright CSC – IT CENTER FOR SCIENCE LTD.
+# All Rights Reserved.
+###############################################################
+---
+- name: Install dependencies for certbot
+  become: yes
+  shell: |
+    yum install -y augeas
+    pip install -U pip
+    pip install certbot certbot-apache
+    pip install -U setuptools
+    pip install requests==2.6.0
+  args:
+    executable: /bin/bash
+
+- name: Run letsencrypt certbot
+  become: yes
+  shell: |
+    certbot -n certonly --agree-tos --email hostmaster@{{ apache2.serverName }} --apache -w /var/www -d {{ apache2.serverName }}
+  args:
+    creates: "/etc/letsencrypt/live/{{ apache2.serverName }}"
+    executable: /bin/bash
+  register: lets_encrypt
+

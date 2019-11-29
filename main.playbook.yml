@@ -1,0 +1,29 @@
+###############################################################
+#
+# Author(s):
+#     Juhapekka Piiroinen <juhapekka.piiroinen@csc.fi>
+#
+# License: MIT
+#
+# (C) 2019 Copyright CSC – IT CENTER FOR SCIENCE LTD.
+# All Rights Reserved.
+###############################################################
+---
+- name: "Setup cPouta project"
+  hosts: localhost
+  connection: local
+  roles:
+    - pouta/security_groups
+    - pouta/create_keypair
+    - pouta/create_instance
+
+- name: Configure Matomo test machine
+  hosts: matomo
+  remote_user: "{{ instance_user }}"
+  roles:
+    - python
+    - docker
+    - docker-compose 
+    - apache2
+    - fairdata/matomo
+

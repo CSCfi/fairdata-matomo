@@ -1,0 +1,72 @@
+###############################################################
+#
+# Author(s):
+#     Juhapekka Piiroinen <juhapekka.piiroinen@csc.fi>
+#
+# License: MIT
+#
+# (C) 2019 Copyright CSC – IT CENTER FOR SCIENCE LTD.
+# All Rights Reserved.
+###############################################################
+---
+- name: Create new instance to cPouta for {{ instance_name }}
+  register: result
+  os_server:
+    state: present
+    name: "{{ instance_name }}"
+    image: CentOS-7
+    flavor: "{{ instance_flavor }}"
+    key_name: "{{ instance_keypair_name }}"
+    security_groups: "{{ security_groups.keys() | list }}"
+    userdata: |
+      #cloud-config
+      chpasswd:
+        list: |
+          {{ instance_user }}:{{ instance_password }}
+        expire: False
+      packages:
+        - yum-utils
+        - device-mapper-persistent-data
+        - lvm2
+        - epel-release
+        - python-pip
+      package_upgrade: true
+
+- debug:
+    var: result
+
+- name: "Prepare the new machine for later use"
+  block:
+    - name: "Store the IP address of the new instance to fact"
+      set_fact:
+        floating_ip: "{{ result.openstack.accessIPv4 }}"
+
+    - debug:
+        var: floating_ip
+
+    - name: Add new host to inventory
+      add_host:
+        name: "{{ floating_ip }}"
+        groups: "{{ instance_inventory_group }}"
+        ansible_ssh_private_key_file: "{{ instance_keypair_path }}"
+
+    - name: Wait for SSH server response
+      wait_for:
+        host: "{{ floating_ip }}"
+        port: 22
+        search_regex: OpenSSH
+
+    - name: Ensure known_hosts for the new instance.
+      block:
+        - known_hosts:
+            name: "{{ floating_ip }}"
+            state: absent
+        - shell: ssh-keyscan -t rsa -H {{ floating_ip }}
+          register: host_key
+        - debug:
+            var: host_key
+        - known_hosts:
+            name: "{{ floating_ip }}"
+            key: "{{ host_key.stdout_lines[0] }}"
+            state: present
+

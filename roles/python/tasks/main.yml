@@ -1,0 +1,21 @@
+###############################################################
+# Author(s):
+#     Juhapekka Piiroinen <juhapekka.piiroinen@csc.fi>
+#
+# License: MIT
+#
+# (C) 2019 Copyright CSC – IT CENTER FOR SCIENCE LTD.
+# All Rights Reserved.
+###############################################################
+---
+- name: Python | Install dependencies
+  shell: yum install -y epel-release python-pip python-devel
+  become: yes
+
+- name: Python | Ensure that all python packages are up to date.
+  shell: yum upgrade -y python*
+  become: yes
+
+- name: Python | Ensure that pip 9.x series for better compatibility
+  shell: pip install --upgrade --force-reinstall pip==9.0.3
+  become: yes

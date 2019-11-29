@@ -1,0 +1,38 @@
+###############################################################
+# Author(s):
+#     Juhapekka Piiroinen <juhapekka.piiroinen@csc.fi>
+#
+# License: MIT
+#
+# (C) 2019 Copyright CSC – IT CENTER FOR SCIENCE LTD.
+# All Rights Reserved.
+###############################################################
+---
+- name: "Install Apache2"
+  block:
+    - shell: yum install -y httpd
+      become: yes
+    - shell: mkdir -p /etc/httpd/conf /etc/httpd/conf.d /var/www/html
+      become: yes
+    - template:
+        src: apache2/conf/httpd.conf
+        dest: /etc/httpd/conf/httpd.conf
+      become: yes
+    - template:
+        src: apache2/conf.d/welcome.conf
+        dest: /etc/httpd/conf.d/welcome.conf
+      become: yes
+    - template:
+        src: apache2/conf.d/http.conf
+        dest: /etc/httpd/conf.d/http.conf
+      become: yes
+    - template:
+        src: apache2/www/index.html
+        dest: /var/www/html/index.html
+      become: yes
+    - name: "Start Apache2"
+      become: yes
+      shell: |
+        systemctl enable httpd
+        systemctl start httpd
+      

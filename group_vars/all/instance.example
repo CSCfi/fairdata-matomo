@@ -1,0 +1,18 @@
+###############################################################
+# Author(s):
+#     Juhapekka Piiroinen <juhapekka.piiroinen@csc.fi>
+#
+# License: MIT
+#
+# (C) 2019 Copyright CSC – IT CENTER FOR SCIENCE LTD.
+# All Rights Reserved.
+###############################################################
+---
+instance_name: "matomo"
+instance_password: "password_for_the_user_here"
+instance_flavor: standard.large
+instance_inventory_group: "matomo"
+instance_user: cloud-user
+
+instance_keypair_name: "{{ instance_name }}"
+instance_keypair_path: ansible-{{ instance_keypair_name }}

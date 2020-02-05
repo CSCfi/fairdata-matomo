@@ -17,6 +17,8 @@ all: venv
 	@echo "=============================================================="
 	@test -f openrc.sh || echo
 	@test -f openrc.sh || echo "Download the openrc.sh file from: https://pouta.csc.fi/dashboard/project/access_and_security/api_access/openrc/"
+	@test -f openrc.sh || echo "Once it is downloaded ensure that there is either by symbolic link or a file named openrc.sh in this current directory."
+	@test -f openrc.sh || echo
 	@test -f openrc.sh || echo "Place the openrc.sh file into this directory: ${PWD}"
 	@test -f openrc.sh || echo
 	@test -f openrc.sh || echo "press <enter> when ready or <ctrl+c> to cancel."

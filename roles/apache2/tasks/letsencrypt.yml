@@ -27,4 +27,12 @@
     creates: "/etc/letsencrypt/live/{{ apache2.serverName }}"
     executable: /bin/bash
   register: lets_encrypt
+  ignore_errors: yes
 
+- name: Enable automatic renewal of ssl certificate
+  become: yes
+  cron:
+    name: "Automatic SSL renewal"
+    minute: "0"
+    hour: "0"
+    job: "certbox renew --quiet"
